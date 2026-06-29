@@ -7,27 +7,21 @@
  * Exposes a C-compatible API for integration with the main C codebase.
  */
 
-#include <complex.h>
-#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <stdio.h>
 #include <string>
+
+#include <taglib/fileref.h>
+#include <taglib/mpegfile.h>
 #include <taglib/apefooter.h>
 #include <taglib/apeitem.h>
 #include <taglib/apetag.h>
 #include <taglib/attachedpictureframe.h>
-#include <taglib/fileref.h>
-#include <taglib/id3v2frame.h>
-#include <taglib/id3v2tag.h>
-#include <taglib/mp4coverart.h>
-#include <taglib/mp4file.h>
-#include <taglib/mpegfile.h>
 #include <taglib/synchronizedlyricsframe.h>
 #include <taglib/tag.h>
 #include <taglib/textidentificationframe.h>
-#include <taglib/xiphcomment.h>
 
 #include "../headers/tagLibWrapper.h"
 

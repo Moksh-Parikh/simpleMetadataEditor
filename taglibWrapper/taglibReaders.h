@@ -1,27 +1,8 @@
 #pragma once
-#include <string>
-#include <algorithm>
-#include <cctype>
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <iomanip>
-#include <sstream>
-#include <vector>
-#include <taglib/apefooter.h>
-#include <taglib/apeitem.h>
-#include <taglib/apetag.h>
-#include <taglib/attachedpictureframe.h>
-#include <taglib/fileref.h>
-#include <taglib/id3v2frame.h>
-#include <taglib/id3v2tag.h>
-#include <taglib/mpegfile.h>
-#include <taglib/synchronizedlyricsframe.h>
-#include <taglib/textidentificationframe.h>
-#include <taglib/xiphcomment.h>
 
 #include <taglib/tag.h>
+#include <taglib/id3v2frame.h>
+#include <taglib/id3v2tag.h>
 #define MAX_LYRIC_SIZE 4096
 
 // Base64 character map for decoding

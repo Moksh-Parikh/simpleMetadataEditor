@@ -21,6 +21,7 @@ int main(void) {
     pullCoverArt(songPath, "./picture");
 
     printf("%s from %s by %s\n", tagSettings.title, tagSettings.album, tagSettings.artist);
+    printf("Recorded on %s\n", tagSettings.date);
     printf("Lyrics:\n%s", lyrics);
 
     free(lyrics);

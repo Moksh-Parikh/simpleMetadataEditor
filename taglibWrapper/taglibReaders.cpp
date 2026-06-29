@@ -5,17 +5,15 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+
 #include <taglib/apefooter.h>
 #include <taglib/apeitem.h>
 #include <taglib/apetag.h>
 #include <taglib/attachedpictureframe.h>
 #include <taglib/fileref.h>
-#include <taglib/id3v2frame.h>
-#include <taglib/id3v2tag.h>
 #include <taglib/mpegfile.h>
 #include <taglib/synchronizedlyricsframe.h>
 #include <taglib/textidentificationframe.h>
-#include <taglib/xiphcomment.h>
 
 #include <taglib/tag.h>
 #include "taglibReaders.h"
@@ -169,43 +167,43 @@ double parseDecibelValue(const TagLib::String &dbString)
 
 static bool detectLrcFormat(const TagLib::StringList &lines)
 {
-        for (const auto &line : lines) {
-                std::string text = line.toCString(true);
-                if (text.size() > 3 && text[0] == '[' && std::isdigit((unsigned char)text[1]))
-                        return true;
-        }
-        return false;
+    for (const auto &line : lines) {
+        std::string text = line.toCString(true);
+        if (text.size() > 3 && text[0] == '[' && std::isdigit((unsigned char)text[1]))
+                return true;
+    }
+    return false;
 }
 
 static bool parseLyricsFromTagLines(const TagLib::StringList &lines, char **lyricsOut)
 {
-        size_t capacity = lines.size() > 64 ? lines.size() : 64;
+    size_t capacity = lines.size() > 64 ? lines.size() : 64;
 
-        char *lyrics = (char *)calloc(MAX_LYRIC_SIZE, sizeof(char));
-        auto lyricsLocation = lyrics;
+    char *lyrics = (char *)calloc(MAX_LYRIC_SIZE, sizeof(char));
+    auto lyricsLocation = lyrics;
 
-        for (size_t i = 0; i < lines.size(); ++i) {
-                std::string text = lines[i].toCString(true);
+    for (size_t i = 0; i < lines.size(); ++i) {
+        std::string text = lines[i].toCString(true);
 
-                // Trim leading/trailing whitespace
-                size_t start = 0;
-                while (start < text.size() && std::isspace((unsigned char)text[start]))
-                        start++;
-                size_t end = text.size();
-                while (end > start && std::isspace((unsigned char)text[end - 1]))
-                        end--;
-                text = text.substr(start, end - start);
+        // Trim leading/trailing whitespace
+        size_t start = 0;
+        while (start < text.size() && std::isspace((unsigned char)text[start]))
+                start++;
+        size_t end = text.size();
+        while (end > start && std::isspace((unsigned char)text[end - 1]))
+                end--;
+        text = text.substr(start, end - start);
 
-                if (text.empty())
-                        continue;
+        if (text.empty())
+                continue;
 
-                snprintf(lyricsLocation, text.length() + 2, "%s\n", text.c_str());
-                lyricsLocation += text.length() + 1;
-        }
+        snprintf(lyricsLocation, text.length() + 2, "%s\n", text.c_str());
+        lyricsLocation += text.length() + 1;
+    }
 
-        *lyricsOut = lyrics;
+    *lyricsOut = lyrics;
 
-        return (lyricsLocation - lyrics) > 0;
+    return (lyricsLocation - lyrics) > 0;
 }
 
 bool loadLyricsFromSYLTTag(TagLib::ID3v2::Tag *id3v2Tag, char **lyricsOut)
@@ -225,10 +223,10 @@ bool loadLyricsFromSYLTTag(TagLib::ID3v2::Tag *id3v2Tag, char **lyricsOut)
     // Count total lines across all SYLT frames
     size_t totalLines = 0;
     for (auto frame : frames) {
-            auto sylt = dynamic_cast<TagLib::ID3v2::SynchronizedLyricsFrame *>(frame);
-            if (!sylt)
-                    continue;
-            totalLines += sylt->synchedText().size();
+        auto sylt = dynamic_cast<TagLib::ID3v2::SynchronizedLyricsFrame *>(frame);
+        if (!sylt)
+                continue;
+        totalLines += sylt->synchedText().size();
     }
 
     if (totalLines == 0) {
@@ -398,6 +396,7 @@ bool looksLikePng(const std::vector<unsigned char> &data)
         }
         return false;
 }
+
 bool looksLikeWebp(const std::vector<unsigned char> &data)
 {
         return data.size() > 12 && memcmp(&data[0], "RIFF", 4) == 0 &&
