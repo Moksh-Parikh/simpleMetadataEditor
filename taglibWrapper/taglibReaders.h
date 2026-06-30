@@ -11,7 +11,7 @@ static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         "0123456789+/";
 
 #define MAX_REASONABLE_SIZE = 100 * 1024 * 1024; // 100MB limit
-                                                 //
+
 std::vector<unsigned char> decodeBase64(const std::string &encoded_string);
 
 std::string toLower(const std::string &str);

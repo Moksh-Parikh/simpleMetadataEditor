@@ -12,6 +12,17 @@ int main(void) {
     char* songPath = "Linkin Park - Blackout.mp3";
     // char* songPath = "Bad Omens - Never Know (Unplugged).mp3";
     getTrackInfo(songPath, &track, &disc);
+
+    union writerData writeData;
+    writeData.intData = 697;
+    
+    writeToFile(songPath, WRITE_YEAR, writeData);
+    writeData.textData = "Kevin Tran";
+    writeToFile(songPath, WRITE_ALBUM, writeData);
+
+    writeData.textData = "Gay metal";
+    writeToFile(songPath, WRITE_GENRE, writeData);
+
     extractTags(
         songPath,
         &tagSettings,
@@ -20,7 +31,7 @@ int main(void) {
     );
     pullCoverArt(songPath, "./picture");
 
-    printf("%s from %s by %s\n", tagSettings.title, tagSettings.album, tagSettings.artist);
+    printf("%s: %s from %s by %s\n", tagSettings.genre, tagSettings.title, tagSettings.album, tagSettings.artist);
     printf("Recorded on %s\n", tagSettings.date);
     printf("Lyrics:\n%s", lyrics);
 

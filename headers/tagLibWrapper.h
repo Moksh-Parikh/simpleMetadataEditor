@@ -9,6 +9,7 @@
 #ifndef TAGLIB_WRAPPER_H
 #define TAGLIB_WRAPPER_H
 
+#include <bits/types/wint_t.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -18,14 +19,29 @@ extern "C" {
 #define METADATA_MAX_LENGTH 256
 typedef struct
 {
-        char title[METADATA_MAX_LENGTH];
-        char artist[METADATA_MAX_LENGTH];
-        char album_artist[METADATA_MAX_LENGTH];
-        char album[METADATA_MAX_LENGTH];
-        char date[METADATA_MAX_LENGTH];
-        double replaygainTrack;
-        double replaygainAlbum;
+    char title[METADATA_MAX_LENGTH];
+    char artist[METADATA_MAX_LENGTH];
+    char album_artist[METADATA_MAX_LENGTH];
+    char album[METADATA_MAX_LENGTH];
+    char date[METADATA_MAX_LENGTH];
+    char genre[METADATA_MAX_LENGTH];
+    double replaygainTrack;
+    double replaygainAlbum;
 } TagSettings;
+
+enum {
+    WRITE_ALBUM,
+    WRITE_ARTIST,
+    WRITE_YEAR,
+    WRITE_TITLE,
+    WRITE_TRACK,
+    WRITE_GENRE
+};
+
+union writerData {
+    int intData;
+    char* textData;
+};
 
 /*
  * @brief Extracts metadata tags, duration, and cover art from an audio file.
@@ -78,6 +94,8 @@ int extractTags(const char *input_file, TagSettings *tag_settings,
 void getTrackInfo(const char *filepath, uint32_t* track, uint32_t* disc);
 
 int pullCoverArt(const char* input_file, const char* coverFilePath);
+
+int writeToFile(char* filePath, int writeMode, union writerData writeData);
 
 #ifdef __cplusplus
 }
