@@ -120,6 +120,7 @@ int main(int argc, char **argv) {
     if (!quiet || dateOrNot) printf("Date: %s\n", tagSettings.date);
     if (lyricsOrNot) printf("Lyrics:\n%s", lyrics);
 
+    // printf("%lf, %lf, %lf\n", duration, tagSettings.replaygainTrack, tagSettings.replaygainAlbum);
     free(lyrics);
 
     return 0;
