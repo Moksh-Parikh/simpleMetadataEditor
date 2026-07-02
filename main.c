@@ -28,7 +28,8 @@ int main(int argc, char **argv) {
     char* writeAlbum  = NULL;
     char* writeTitle  = NULL;
     char* songPath    = NULL;
-    char* artworkPath = NULL;
+    char* artworkInPath = NULL;
+    char* artworkOutPath = NULL;
     
     struct argparse_option options[] = {
         OPT_HELP(), // "When only a filename is specifed, the output follows the following format"
@@ -40,9 +41,10 @@ int main(int argc, char **argv) {
         OPT_STRING('g', "write_genre", &writeGenre, "edit the genre", NULL, 0, 0),
         OPT_STRING('a', "write_artist", &writeArtist, "edit the artist", NULL, 0, 0),
         OPT_STRING('l', "write_lyrics", &lyricsPath, "path to file containing lyrics to be embedded", NULL, 0, 0),
+        OPT_STRING('p', "write_picture", &artworkInPath, "path to file containing picture to be embedded", NULL, 0, 0),
         OPT_GROUP("Querying Options"),
         OPT_BOOLEAN('q', "quiet", &quiet, "don't read current metadata", NULL, 0, 0),
-        OPT_STRING('e', "extract_artwork", &artworkPath, "extract the cover artwork to the specifed path", NULL, 0, 0),
+        OPT_STRING('e', "extract_artwork", &artworkOutPath, "extract the cover artwork to the specifed path", NULL, 0, 0),
         OPT_BOOLEAN('1', "show_lyrics", &lyricsOrNot, "read the lyrics from SYLT or USLT tags", NULL, 0, 0),
         OPT_BOOLEAN('2', "show_genre", &genreOrNot, "read the genre", NULL, 0, 0),
         OPT_BOOLEAN('3', "show_artist", &artistOrNot, "read the artist", NULL, 0, 0),
@@ -84,6 +86,11 @@ int main(int argc, char **argv) {
         writeData.intData = writeDate;
         writeToFile(songPath, WRITE_YEAR, writeData);
     }
+    
+    if (artworkInPath != NULL) {
+        writeData.textData = artworkInPath;
+        writeToFile(songPath, WRITE_PICTURE, writeData);
+    }
 
     if (lyricsPath != NULL) {
         FILE* lyricFile = fopen(lyricsPath, "r");
@@ -93,6 +100,7 @@ int main(int argc, char **argv) {
         char* lyricsToBeWritten = calloc(sz, sizeof(char));
 
         fread(lyricsToBeWritten, sizeof(char), sz, lyricFile);
+        fclose(lyricFile);
         writeData.textData = lyricsToBeWritten;
         writeToFile(songPath, WRITE_LYRICS, writeData);
         free(lyricsToBeWritten);
@@ -111,7 +119,7 @@ int main(int argc, char **argv) {
         &lyrics
     );
 
-    if (artworkPath != NULL) pullCoverArt(songPath, artworkPath);
+    if (artworkOutPath != NULL) pullCoverArt(songPath, artworkOutPath);
 
     if (!quiet || titleOrNot) printf("Title: %s\n", tagSettings.title);
     if (!quiet || artistOrNot) printf("Artist: %s\n", tagSettings.artist);

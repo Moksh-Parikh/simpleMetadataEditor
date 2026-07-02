@@ -35,11 +35,5 @@ unsigned int read_uint32_be(const unsigned char *buffer,
                             size_t buffer_size,
                             size_t offset);
 
-bool looksLikeJpeg(const std::vector<unsigned char> &data);
-
-bool looksLikePng(const std::vector<unsigned char> &data);
-
-bool looksLikeWebp(const std::vector<unsigned char> &data);
-
 bool extractCoverArtFromMp3(const std::string &inputFile,
                             const std::string &coverFilePath);

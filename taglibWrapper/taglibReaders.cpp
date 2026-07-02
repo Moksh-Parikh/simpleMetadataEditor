@@ -14,8 +14,9 @@
 #include <taglib/mpegfile.h>
 #include <taglib/synchronizedlyricsframe.h>
 #include <taglib/textidentificationframe.h>
-
 #include <taglib/tag.h>
+
+#include "tagLibUtils.h"
 #include "taglibReaders.h"
 
 std::vector<unsigned char> decodeBase64(const std::string &encoded_string)

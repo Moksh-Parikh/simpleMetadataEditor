@@ -37,7 +37,8 @@ enum writeMode {
     WRITE_TITLE,
     WRITE_TRACK,
     WRITE_GENRE,
-    WRITE_LYRICS
+    WRITE_LYRICS,
+    WRITE_PICTURE
 };
 
 enum lyricType {

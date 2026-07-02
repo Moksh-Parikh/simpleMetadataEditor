@@ -4,6 +4,7 @@
 #include <taglib/attachedpictureframe.h>
 #include <taglib/fileref.h>
 #include <taglib/mpegfile.h>
+#include <taglib/tbytevector.h>
 #include <taglib/textidentificationframe.h>
 #include <taglib/tpropertymap.h>
 #include <taglib/id3v2tag.h>
@@ -15,6 +16,7 @@
 #include <taglib/tstring.h>
 
 #include "../headers/tagLibWrapper.h"
+#include "tagLibUtils.h"
 
 void writeUSLTTag(TagLib::FileRef file, char* lyrics) {
     TagLib::ID3v2::Tag* songTag = (dynamic_cast<TagLib::MPEG::File *>(file.file()))->ID3v2Tag();
@@ -71,6 +73,28 @@ void writeSYLTTag(TagLib::FileRef file, char* lyrics) {
 
 }
 
+void writeAlbumArt(TagLib::FileRef file, char* art_path) {
+    FILE* art_file = fopen(art_path, "rb");
+    fseek(art_file, 0L, SEEK_END);
+    size_t sz = ftell(art_file);
+    fseek(art_file, 0L, SEEK_SET);
+    char* imageData = (char*)calloc(sz, sizeof(char));
+
+    fread(imageData, sizeof(char), sz, art_file);
+    fclose(art_file);
+    TagLib::ByteVector data = TagLib::ByteVector(imageData, sz);
+    const char* mimeType = getPictureMimeType(imageData, sz);
+    free(imageData);
+
+    file.setComplexProperties("PICTURE", {
+      {
+        {"data", data},
+        {"pictureType", "Front Cover"},
+        {"mimeType", mimeType}
+      }
+    });
+}
+
 void writeLyrics(TagLib::FileRef file, char* lyrics, enum lyricType whichLyrics) {
     switch (whichLyrics) {
         case USLT:
@@ -89,6 +113,8 @@ void writeIntData(TagLib::Tag* tag, enum writeMode writingMode, int data) {
         case WRITE_TRACK:
             tag->setTrack(data);
             break;
+        default:
+            break;
     }
 }
 
@@ -106,6 +132,8 @@ void writeStringData(TagLib::Tag* tag, enum writeMode writingMode, char* data) {
         case WRITE_TITLE:
             tag->setTitle(data);
             break;
+        default:
+            break;
     }
 }
 
@@ -119,6 +147,9 @@ int writeToFile(char* filePath, enum writeMode writingMode, union writerData wri
             break;
         case WRITE_LYRICS:
             writeLyrics(file, writeData.textData, USLT);
+            break;
+        case WRITE_PICTURE:
+            writeAlbumArt(file, writeData.textData);
             break;
         default:
             writeStringData(file.tag(), writingMode, writeData.textData);
