@@ -9,7 +9,6 @@
 #ifndef TAGLIB_WRAPPER_H
 #define TAGLIB_WRAPPER_H
 
-#include <bits/types/wint_t.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -29,13 +28,19 @@ typedef struct
     double replaygainAlbum;
 } TagSettings;
 
-enum {
+enum writeMode {
     WRITE_ALBUM,
     WRITE_ARTIST,
     WRITE_YEAR,
     WRITE_TITLE,
     WRITE_TRACK,
-    WRITE_GENRE
+    WRITE_GENRE,
+    WRITE_LYRICS
+};
+
+enum lyricType {
+    USLT,
+    SYLT
 };
 
 union writerData {
@@ -95,7 +100,7 @@ void getTrackInfo(const char *filepath, uint32_t* track, uint32_t* disc);
 
 int pullCoverArt(const char* input_file, const char* coverFilePath);
 
-int writeToFile(char* filePath, int writeMode, union writerData writeData);
+int writeToFile(char* filePath, enum writeMode writingMode, union writerData writeData);
 
 #ifdef __cplusplus
 }

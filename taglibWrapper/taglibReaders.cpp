@@ -216,7 +216,6 @@ bool loadLyricsFromSYLTTag(TagLib::ID3v2::Tag *id3v2Tag, char **lyricsOut)
     auto frames = id3v2Tag->frameList("SYLT");
     if (frames.isEmpty()) {
         *lyricsOut = NULL;
-        printf("no frame\n");
         return false;
     }
 

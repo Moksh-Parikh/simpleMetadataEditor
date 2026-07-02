@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
 
     char* writeArtist = NULL;
     char* writeGenre  = NULL;
+    char* lyricsPath  = NULL;
     char* writeAlbum  = NULL;
     char* writeTitle  = NULL;
     char* songPath    = NULL;
@@ -33,11 +34,12 @@ int main(int argc, char **argv) {
         OPT_HELP(), // "When only a filename is specifed, the output follows the following format"
         OPT_GROUP("Editing Options"),
         OPT_INTEGER('d', "write_date", &writeDate, "edit the date", NULL, 0, 0),
-        OPT_STRING('f', "file_path", &songPath, "edit the title", NULL, 0, 0),
+        OPT_STRING('f', "file_path", &songPath, "path to file to be edited", NULL, 0, 0),
         OPT_STRING('t', "write_title", &writeTitle, "edit the title", NULL, 0, 0),
-        OPT_STRING('r', "write_album", &writeAlbum, "edit the title", NULL, 0, 0),
-        OPT_STRING('g', "write_genre", &writeGenre, "edit the title", NULL, 0, 0),
-        OPT_STRING('a', "write_artist", &writeArtist, "edit the title", NULL, 0, 0),
+        OPT_STRING('r', "write_album", &writeAlbum, "edit the album", NULL, 0, 0),
+        OPT_STRING('g', "write_genre", &writeGenre, "edit the genre", NULL, 0, 0),
+        OPT_STRING('a', "write_artist", &writeArtist, "edit the artist", NULL, 0, 0),
+        OPT_STRING('l', "write_lyrics", &lyricsPath, "path to file containing lyrics to be embedded", NULL, 0, 0),
         OPT_GROUP("Querying Options"),
         OPT_BOOLEAN('q', "quiet", &quiet, "don't read current metadata", NULL, 0, 0),
         OPT_STRING('e', "extract_artwork", &artworkPath, "extract the cover artwork to the specifed path", NULL, 0, 0),
@@ -81,6 +83,19 @@ int main(int argc, char **argv) {
     if (writeDate >= 0) {
         writeData.intData = writeDate;
         writeToFile(songPath, WRITE_YEAR, writeData);
+    }
+
+    if (lyricsPath != NULL) {
+        FILE* lyricFile = fopen(lyricsPath, "r");
+        fseek(lyricFile, 0L, SEEK_END);
+        size_t sz = ftell(lyricFile);
+        fseek(lyricFile, 0L, SEEK_SET);
+        char* lyricsToBeWritten = calloc(sz, sizeof(char));
+
+        fread(lyricsToBeWritten, sizeof(char), sz, lyricFile);
+        writeData.textData = lyricsToBeWritten;
+        writeToFile(songPath, WRITE_LYRICS, writeData);
+        free(lyricsToBeWritten);
     }
     
 

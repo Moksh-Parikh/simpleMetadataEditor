@@ -209,7 +209,6 @@ int extractTags(const char *input_file, TagSettings *tag_settings,
 
                 // 2) USLT fallback (may contain LRC timestamps)
                 if (*lyrics == nullptr) {
-                    printf("loading from USLT\n");
                     loadLyricsFromUSLTTag(mpegFile->ID3v2Tag(), lyrics);
                 }
             }
