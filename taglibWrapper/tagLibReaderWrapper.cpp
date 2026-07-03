@@ -200,13 +200,19 @@ int extractTags(const char *input_file, TagSettings *tag_settings,
 
         // Use TagLib's FileRef for generic file parsing.
         TagLib::FileRef f(input_file);
-        if (f.isNull() || !f.file()) {
-                fprintf(stderr,
-                        "FileRef is null or file could not be opened: "
-                        "'%s'\n",
-                        input_file);
+        if (f.isNull()) {
+            fprintf(stderr,
+                    "FileRef is null\n");
 
-                return -1;
+            return -3;
+        }
+
+        if (!f.file()) {
+            fprintf(stderr,
+                    "File could not be opened: '%s'\n",
+                    input_file);
+
+            return -1;
         }
 
         const TagLib::Tag *tag = f.tag();

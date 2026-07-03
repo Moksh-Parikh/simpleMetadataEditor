@@ -78,7 +78,10 @@ union writerData {
  *               any lyrics found in the audio file.
  *
  * @return 0 if successful,
- *         -2 if the file is invalid or could not be parsed.
+ *         -1 for a file that couldn't be opened
+ *         -2 if the file is missing a tag,
+ *              or audioProperties (duration)
+ *         -3 for a NULL FileRef
  *
  * @note This function relies on the TagLib library to parse audio files and
  *       extract metadata. It also supports cover art extraction

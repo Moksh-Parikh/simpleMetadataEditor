@@ -60,7 +60,25 @@ int main(int argc, char **argv) {
 
     argc = argparse_parse(&argparse, argc, (const char **)argv);
 
+    if (argc == 1 &&
+        writeAlbum == NULL &&
+        writeDate == -1 &&
+        writeArtist == NULL &&
+        writeGenre == NULL &&
+        writeTitle == NULL &&
+        artworkInPath == NULL &&
+        artworkOutPath == NULL &&
+        songPath == NULL
+    ) {
+        songPath = argv[0];
+    }
+    
     union writerData writeData;
+
+    if (songPath == NULL) {
+        printf("Specify a file path\n");
+        return 1;
+    }
 
     if (writeTitle != NULL) {
         writeData.textData = writeTitle;
@@ -112,12 +130,24 @@ int main(int argc, char **argv) {
 
     char* lyrics = NULL;
 
-    extractTags(
-        songPath,
-        &tagSettings,
-        &duration,
-        &lyrics
-    );
+    int status =
+        extractTags(
+            songPath,
+            &tagSettings,
+            &duration,
+            &lyrics
+        );
+
+    switch (status) {
+        case -1:
+            printf("Specify a valid mp3 file\n");
+            return 1;
+        case -3:
+            printf("TagLib failed to create a valid FileRef, exiting\n");
+            return 1;
+        default:
+            break;
+    }
 
     if (artworkOutPath != NULL) pullCoverArt(songPath, artworkOutPath);
 
