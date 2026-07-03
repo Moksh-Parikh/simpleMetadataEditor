@@ -6,6 +6,7 @@
 #include <taglib/mpegfile.h>
 #include <taglib/tbytevector.h>
 #include <taglib/textidentificationframe.h>
+#include <taglib/tlist.h>
 #include <taglib/tpropertymap.h>
 #include <taglib/id3v2tag.h>
 #include <taglib/id3v2frame.h>
@@ -19,6 +20,9 @@
 #include "tagLibUtils.h"
 
 void writeUSLTTag(TagLib::FileRef file, char* lyrics) {
+    if(file.isNull())
+        return;
+
     TagLib::ID3v2::Tag* songTag = (dynamic_cast<TagLib::MPEG::File *>(file.file()))->ID3v2Tag();
     if (songTag == nullptr) {
         return;
@@ -43,34 +47,71 @@ void writeUSLTTag(TagLib::FileRef file, char* lyrics) {
     }
 }
 
-//!TODO complete this function
-void writeSYLTTag(TagLib::FileRef file, char* lyrics) {
-    if (lyrics == NULL) return;
-    TagLib::ID3v2::Tag* songTag = (dynamic_cast<TagLib::MPEG::File *>(file.file()))->ID3v2Tag();
-    if (songTag == nullptr) {
+void writeSYLTTag(TagLib::FileRef file, char *lyrics)
+{
+    if(file.isNull())
         return;
+
+    auto *mpeg = dynamic_cast<TagLib::MPEG::File *>(file.file());
+    if(!mpeg)
+        return;
+
+    TagLib::ID3v2::Tag *tag = mpeg->ID3v2Tag(true);
+    if(!tag)
+        return;
+
+    // Remove any existing SYLT frames.
+    TagLib::ID3v2::FrameList frames = tag->frameListMap()["SYLT"];
+    for(auto *frame : frames)
+        tag->removeFrame(frame, true);
+
+    auto *sylt = new TagLib::ID3v2::SynchronizedLyricsFrame;
+    sylt->setTextEncoding(TagLib::String::UTF8);
+    sylt->setLanguage("eng");
+    sylt->setTimestampFormat(
+        TagLib::ID3v2::SynchronizedLyricsFrame::AbsoluteMilliseconds);
+    sylt->setType(
+        TagLib::ID3v2::SynchronizedLyricsFrame::Lyrics);
+
+    std::istringstream stream(lyrics);
+    std::string line;
+
+    TagLib::ID3v2::SynchronizedLyricsFrame::SynchedTextList lyricsList;
+
+    while(std::getline(stream, line))
+    {
+        if(line.size() < 11 || line[0] != '[')
+            continue;
+
+        unsigned minutes, seconds, centiseconds;
+
+        if(std::sscanf(line.c_str(),
+                       "[%u:%u.%u]",
+                       &minutes,
+                       &seconds,
+                       &centiseconds) != 3)
+            continue;
+
+        uint32_t timestamp =
+            (minutes * 60 + seconds) * 1000 +
+            centiseconds * 10;
+
+        std::size_t closing = line.find(']');
+        if(closing == std::string::npos)
+            continue;
+
+        if (std::isspace(closing + 1)) closing += 1;
+        std::string text = line.substr(closing + 1);
+        lyricsList.append(
+            TagLib::ID3v2::SynchronizedLyricsFrame::SynchedText(
+                timestamp,
+                TagLib::String(text, TagLib::String::UTF8)
+            )
+        );
     }
+    sylt->setSynchedText(lyricsList);
 
-    TagLib::ID3v2::FrameList fileFrameList = songTag->frameList("SYLT");
-    
-    TagLib::ID3v2::SynchronizedLyricsFrame* syltTag = 
-        dynamic_cast<TagLib::ID3v2::SynchronizedLyricsFrame*>(fileFrameList[0]);
-
-
-    if (syltTag) {
-        // for (auto lyricLine : std::string(lyrics).split('\n')) {
-            
-        // }
-    }
-    else {
-        TagLib::ID3v2::SynchronizedLyricsFrame* newSYLTFrame = 
-            new TagLib::ID3v2::SynchronizedLyricsFrame();
-
-        newSYLTFrame->setText(lyrics);
-        newSYLTFrame->setDescription("Lyrics");
-        songTag->addFrame(newSYLTFrame);
-    }
-
+    tag->addFrame(sylt);
 }
 
 void writeAlbumArt(TagLib::FileRef file, char* art_path) {
@@ -101,6 +142,7 @@ void writeLyrics(TagLib::FileRef file, char* lyrics, enum lyricType whichLyrics)
             writeUSLTTag(file, lyrics);
             break;
         case SYLT:
+            writeSYLTTag(file, lyrics);
             break;
     }
 };
@@ -145,8 +187,11 @@ int writeToFile(char* filePath, enum writeMode writingMode, union writerData wri
         case WRITE_TRACK:
             writeIntData(file.tag(), writingMode, writeData.intData);
             break;
-        case WRITE_LYRICS:
+        case WRITE_USLT:
             writeLyrics(file, writeData.textData, USLT);
+            break;
+        case WRITE_SYLT:
+            writeLyrics(file, writeData.textData, SYLT);
             break;
         case WRITE_PICTURE:
             writeAlbumArt(file, writeData.textData);

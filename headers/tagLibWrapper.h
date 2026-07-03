@@ -10,6 +10,7 @@
 #define TAGLIB_WRAPPER_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,7 +38,8 @@ enum writeMode {
     WRITE_TITLE,
     WRITE_TRACK,
     WRITE_GENRE,
-    WRITE_LYRICS,
+    WRITE_USLT,
+    WRITE_SYLT,
     WRITE_PICTURE
 };
 
@@ -104,6 +106,9 @@ void getTrackInfo(const char *filepath, uint32_t* track, uint32_t* disc);
 int pullCoverArt(const char* input_file, const char* coverFilePath);
 
 int writeToFile(char* filePath, enum writeMode writingMode, union writerData writeData);
+
+bool c_detectLrcFormat(char* lyrics);
+const char* getPictureMimeType(char* fileData, size_t size);
 
 #ifdef __cplusplus
 }

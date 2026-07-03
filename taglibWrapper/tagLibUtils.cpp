@@ -1,5 +1,10 @@
 #include <cstring>
+#include <stdbool.h>
+#include <string>
 #include <vector>
+
+#include <taglib/tstringlist.h>
+#include <taglib/tag.h>
 
 #include "tagLibUtils.h"
 
@@ -32,6 +37,20 @@ bool looksLikeWebp(const std::vector<unsigned char> &data)
                memcmp(&data[8], "WEBP", 4) == 0;
 }
 
+extern "C" {
+
+bool c_detectLrcFormat(char* lyrics) {
+    std::istringstream stream(lyrics);
+    std::string line;
+
+    while (std::getline(stream, line)) {
+        std::string text = line.c_str();
+        if (text.size() > 3 && text[0] == '[' && std::isdigit((unsigned char)text[1]))
+                return true;
+    }
+    return false;
+}
+
 const char* getPictureMimeType(char* fileData, size_t size) {
     std::vector<unsigned char> imageData (fileData, fileData + size);
 
@@ -48,4 +67,5 @@ const char* getPictureMimeType(char* fileData, size_t size) {
     }
 
     return NULL;
+}
 }

@@ -120,7 +120,12 @@ int main(int argc, char **argv) {
         fread(lyricsToBeWritten, sizeof(char), sz, lyricFile);
         fclose(lyricFile);
         writeData.textData = lyricsToBeWritten;
-        writeToFile(songPath, WRITE_LYRICS, writeData);
+
+        if (c_detectLrcFormat(lyricsToBeWritten))
+            writeToFile(songPath, WRITE_SYLT, writeData);
+        else
+            writeToFile(songPath, WRITE_USLT, writeData);
+
         free(lyricsToBeWritten);
     }
     
